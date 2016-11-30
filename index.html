@@ -1,0 +1,251 @@
+ 
+<html ng-app="app">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"/>
+	
+	<link rel="stylesheet" href="css/animate.css"/>
+	
+	
+    <title>Index</title>
+    <style>
+        body{
+            margin:0;
+            background:#eee;
+        }
+
+
+        .movie-cat {
+        }
+
+        .movie-item {
+            border: 1px solid black;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        /*#flow-container {
+            width: 100%;
+            text-align: center;
+        }
+
+        .flow-item-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .flip-item {
+            position: relative;
+            display: inline-block;
+            perspective: 800px;
+            margin-right: -117px;
+            white-space: normal;
+            word-spacing: normal;
+            vertical-align: bottom;
+        }
+
+        .flip-content {
+            transform-origin: 50% 100%;
+        }
+
+        .flip-item.past {
+            z-index: 1;
+        }
+
+        .flip-item.future {
+            z-index: 1;
+        }
+
+        .flip-content {
+            position: relative;
+        }
+
+        .flip-item.past .flip-content {
+            transform-origin: 0 50%;
+            transform: scale(.75) rotateY(55deg);
+        }
+
+        .flip-item.future .flip-content {
+           transform-origin: 100% 50%;
+           transform: scale(.75) rotateY(-55deg);
+        }
+
+        .flip-content img {
+            width: 200px;
+        }
+
+        .flip-item.current {
+            z-index: 10;
+        }*/
+        figure{
+            margin:0;
+        }
+        .container{
+            background:white;
+        }
+    </style>
+</head>
+<body ng-controller="movieCtrl">
+ 
+    <carousel3d ng-model="originalMovies"
+                options="options"
+                on-selected-click="selectedClick(index)"
+                on-slide-change="slideChanged(index)"
+                on-last-slide="lastSlide(index)"
+                on-before-change="beforeChange(index)">
+        <carousel3d-slide ng-repeat="slide in originalMovies">
+            <figure>
+                <img ng-src="{{slide.imageUrl}}" alt="" />
+               
+            </figure>
+        </carousel3d-slide>
+    </carousel3d>
+
+  
+
+
+
+
+    <div class="container">
+        <input class="form-control" type="text" placeholder="Search" ng-model-options="{'debounce':500}" ng-model="search" />
+        <div class="movie-cat" ng-repeat="(key, value) in movieCategories">
+            {{key}} ({{value}})
+            <div class="movie-item" ng-repeat="movie in getMoviesByCategory(key)">
+                <a ng-repeat="i in getStars(movie.rating) track by $index">&#9733;</a><a ng-repeat="i in getStarsWhite(movie.rating) track by $index">&#9734;</a>
+                <p><a ng-href="http://www.imdb.com/find?q={{movie.title}}">{{movie.title}}</a></p>
+            </div>
+        </div>
+
+    </div>
+    <link href="Scripts/carousel-3d.css" rel="stylesheet" />
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="Scripts/angular.js"></script>
+    <script src="Scripts/angular-sanitize.js"></script>
+    <script src="http://vladimirbujanovic.com/angular-carousel-3d/bower_components/angular-swipe/dist/angular-swipe.js"></script>
+    <script src="Scripts/carousel-3d.js"></script>
+
+    <script>
+        angular.module("app", ['ngSanitize','angular-carousel-3d']);
+        angular.module("app").controller("movieCtrl", function ($scope) {
+
+
+
+
+
+            $scope.options = {
+                sourceProp: 'imageUrl',
+                visible: 5,
+                perspective: 35,
+                startSlide: 0,
+                border: 0,
+                dir: 'ltr',
+                width: 200,
+
+                space: 220,
+                //autoRotationSpeed:4500,
+                loop: true,
+                clicking: true
+            };
+
+
+
+
+
+
+var movies = [
+        { title: 'The Matrix', description: "A computer hacker learns from mysterious rebels about the true nature of his reality and his role in the war against its controllers.", imageUrl: "http://ia.media-imdb.com/images/M/MV5BMTkxNDYxOTA4M15BMl5BanBnXkFtZTgwNTk0NzQxMTE@._V1_SX640_SY720_.jpg", rating: 7.5, category: 'Action'},
+        { title: 'Focus', description: "In the midst of veteran con man Nicky's latest scheme, a woman from his past - now an accomplished femme fatale - shows up and throws his plans for a loop.", imageUrl: "http://ia.media-imdb.com/images/M/MV5BMTUwODg2OTA4OF5BMl5BanBnXkFtZTgwOTE5MTE4MzE@._V1_SX640_SY720_.jpg", rating: 6.9, category: 'Comedy'},
+        { title: 'The Lazarus Effect', description: "A group of medical students discover a way to bring dead patients back to life.", imageUrl: "http://ia.media-imdb.com/images/M/MV5BMjM2ODM1OTA0M15BMl5BanBnXkFtZTgwMDMxMDI5MzE@._V1_SX640_SY720_.jpg", rating: 6.4, category: 'Thriller'},
+        { title: 'Everly', description: "An action/thriller centered on a woman who faces down hitmen sent by her ex, a mob boss, while holed up in her apartment.", imageUrl: "http://ia.media-imdb.com/images/M/MV5BMjEyNTU4NTE5NV5BMl5BanBnXkFtZTgwNzY4NzIxNDE@._V1_SX640_SY720_.jpg", rating: 5.0, category: 'Action'},
+        { title: 'Maps to the Stars', description: "A tour into the heart of a Hollywood family chasing celebrity, one another and the relentless ghosts of their pasts.", imageUrl: "http://ia.media-imdb.com/images/M/MV5BMTY3MjQwNzYyNV5BMl5BanBnXkFtZTgwNTY3NDQ5MzE@._V1_SX640_SY720_.jpg", rating: 7.5, category: 'Drama'}
+];
+
+            $scope.originalMovies = angular.copy(movies);
+            $scope.$watch("search", function (nVal, oVal) {
+                if (nVal != undefined) {
+                    $scope.originalMovies = movies.filter(function (movie) {
+                        return movie.title.toLowerCase().indexOf(nVal.toLowerCase()) > -1;
+
+                    });
+                    //console.log("orig", $scope.originalMovies);
+                    loadMovies($scope.originalMovies);
+                }
+            });
+            $scope.setActive = function (movie) {
+                $scope.activeMovie = movie;
+
+            }
+            $scope.checkMiddle = function (index, length,movie) {
+                //console.log(index, length);
+                var middle = parseInt(length / 2);
+                if (index == middle) {
+                    $scope.activeMovie = movie;
+                    return 'current';
+                }
+                else if (index < middle) {
+                    return 'past';
+                }
+                else {
+                    return 'future';
+                }
+
+            }
+            $scope.selectedClick = selectedClick;
+
+            function selectedClick(index) {
+                console.log('Selected Slide Clicked callback triggered. \n == Slide index is: ' + index + ' ==');
+            }
+
+
+            $scope.getMoviesByCategory = function (category) {
+                var filteredMovies = $scope.originalMovies.filter(function (movie) {
+                    return movie.category == category;
+                });
+                //console.log("filteredMovies", filteredMovies);
+                return filteredMovies;
+            }
+
+            $scope.getStars = function (num) {
+                return new Array(Math.round(num));
+            }
+            $scope.getStarsWhite = function (num) {
+                return new Array(10 - Math.round(num));
+            }
+            //  $scope.getStars = function (number) {
+            //    var stars = [];
+            //    var ratingFilledStars = Math.round(number);
+            //    for (var i = 0; i < ratingFilledStars; i++) {
+            //        stars.push("&#9733;")
+            //    }
+            //    for (var j = 0; j < 10 - ratingFilledStars; j++) {
+            //        stars.push("&#9734;")
+            //    }
+            //    return stars;
+            //}
+            loadMovies($scope.originalMovies);
+            function loadMovies(movies) {
+                var distictCategories = {};
+                movies.forEach(function (movieItem) {
+                    if (!distictCategories[movieItem.category]) {
+                        distictCategories[movieItem.category] = 1;
+                    }
+                    else {
+
+                        distictCategories[movieItem.category] = ++distictCategories[movieItem.category];
+                    }
+
+                });
+                //console.log("distictCategories", distictCategories);
+                //var categoriesItemCount
+
+
+                $scope.movieCategories = distictCategories;
+            }
+
+
+        });
+
+
+    </script>
+</body>
+</html>
